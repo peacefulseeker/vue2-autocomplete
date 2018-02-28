@@ -109,7 +109,7 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/js/components/vue-autocomplete.vue"
+Component.options.__file = "src\\js\\components\\vue-autocomplete.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] vue-autocomplete.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -180,22 +180,15 @@ if (false) {(function () {
 //
 //
 //
-//
-//
-//
-//
-//
-
 
 /*! Copyright (c) 2016 Naufal Rabbani (http://github.com/BosNaufal)
-* Licensed Under MIT (http://opensource.org/licenses/MIT)
-*
-* Vue 2 Autocomplete @ Version 0.0.1
-*
-*/
+  * Licensed Under MIT (http://opensource.org/licenses/MIT)
+  *
+  * Vue 2 Autocomplete @ Version 0.0.1
+  *
+  */
 
 /* harmony default export */ __webpack_exports__["a"] = ({
-
   props: {
     id: String,
     name: String,
@@ -238,6 +231,9 @@ if (false) {(function () {
     // Label of list
     label: String,
 
+    // Max height of drop down list
+    maxHeight: String,
+
     // Debounce time
     debounce: Number,
 
@@ -250,7 +246,7 @@ if (false) {(function () {
     // query param
     param: {
       type: String,
-      default: 'q'
+      default: "q"
     },
 
     encodeParams: {
@@ -306,7 +302,7 @@ if (false) {(function () {
         var type = this.type,
             anchor = this.anchor;
 
-        var regex = new RegExp("" + type, 'i');
+        var regex = new RegExp("" + type, "i");
         var filtered = newVal.filter(function (item) {
           var found = item[anchor].search(regex) !== -1;
           return found;
@@ -324,7 +320,7 @@ if (false) {(function () {
           className = this.className;
 
       if (classes[part]) return "" + classes[part];
-      return className ? className + "-" + part : '';
+      return className ? className + "-" + part : "";
     },
 
 
@@ -344,8 +340,8 @@ if (false) {(function () {
 
 
     /*==============================
-      INPUT EVENTS
-    =============================*/
+        INPUT EVENTS
+      =============================*/
     handleInput: function handleInput(e) {
       var _this = this;
 
@@ -362,6 +358,11 @@ if (false) {(function () {
         }, this.debounce);
       } else {
         return this.getData(value);
+      }
+    },
+    itemView: function itemView(item) {
+      if (item && item.scrollIntoView) {
+        item.scrollIntoView(false);
       }
     },
     handleKeyDown: function handleKeyDown(e) {
@@ -381,9 +382,11 @@ if (false) {(function () {
         case DOWN:
           e.preventDefault();
           this.focusList++;
+          this.itemView(this.$refs['autocomplete-list-items'][this.focusList]);
           break;
         case UP:
           e.preventDefault();
+          this.itemView(this.$refs['autocomplete-list-items'][this.focusList]);
           this.focusList--;
           break;
         case ENTER:
@@ -413,8 +416,8 @@ if (false) {(function () {
 
 
     /*==============================
-      LIST EVENTS
-    =============================*/
+        LIST EVENTS
+      =============================*/
 
     handleDoubleClick: function handleDoubleClick() {
       this.json = [];
@@ -443,8 +446,9 @@ if (false) {(function () {
       this.focusList = i;
     },
     activeClass: function activeClass(i) {
-      var focusClass = i === this.focusList ? 'focus-list' : '';
-      return "" + focusClass;
+      var focusClass = i === this.focusList ? "focus-list" : "";
+      var userClass = "" + this.getClassName('item');
+      return focusClass ? focusClass + " " + userClass : "" + userClass;
     },
     selectList: function selectList(data) {
       // Deep clone of the original object
@@ -457,7 +461,7 @@ if (false) {(function () {
       this.onSelect ? this.onSelect(clean) : null;
     },
     deepValue: function deepValue(obj, path) {
-      var arrayPath = path.split('.');
+      var arrayPath = path.split(".");
       for (var i = 0; i < arrayPath.length; i++) {
         obj = obj[arrayPath[i]];
       }
@@ -466,8 +470,8 @@ if (false) {(function () {
 
 
     /*==============================
-      AJAX EVENTS
-    =============================*/
+        AJAX EVENTS
+      =============================*/
 
     composeParams: function composeParams(val) {
       var _this3 = this;
@@ -501,14 +505,14 @@ if (false) {(function () {
       var params = this.composeParams(val);
       // Init Ajax
       var ajax = new XMLHttpRequest();
-      ajax.open('GET', this.url + "?" + params, true);
+      ajax.open("GET", this.url + "?" + params, true);
       this.composeHeader(ajax);
       // Callback Event
-      ajax.addEventListener('progress', function (data) {
+      ajax.addEventListener("progress", function (data) {
         if (data.lengthComputable && _this5.onAjaxProgress) _this5.onAjaxProgress(data);
       });
       // On Done
-      ajax.addEventListener('loadend', function (e) {
+      ajax.addEventListener("loadend", function (e) {
         var responseText = e.target.responseText;
 
         var json = JSON.parse(responseText);
@@ -539,6 +543,7 @@ if (false) {(function () {
   },
 
   created: function created() {
+    console.log(this.maxHeight);
     // Sync parent model with initValue Props
     this.type = this.initValue ? this.initValue : null;
   },
@@ -698,9 +703,16 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
       value: (_vm.showList && _vm.json.length),
       expression: "showList && json.length"
     }],
+    ref: "autocomplete-list",
     class: ((_vm.getClassName('list')) + " autocomplete autocomplete-list")
-  }, [_c('ul', _vm._l((_vm.json), function(data, i) {
+  }, [_c('ul', {
+    style: ({
+      'max-height': _vm.maxHeight
+    })
+  }, _vm._l((_vm.json), function(data, i) {
     return _c('li', {
+      ref: "autocomplete-list-items",
+      refInFor: true,
       class: _vm.activeClass(i)
     }, [_c('a', {
       attrs: {
